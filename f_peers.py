@@ -5,7 +5,7 @@ from multiprocessing import Process,Lock,Manager,Queue
 from datetime import timedelta
 from f_mailbox import Mailbox
 from payments import payment
-import copy,gc,psutil
+import copy,gc
 
 lock = Lock()
 
