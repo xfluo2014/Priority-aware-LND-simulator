@@ -82,10 +82,7 @@ class Pay_agent():
             self.state.pre_decision = np.array([x for x in decision])
         else:
             print('Lose msg from cooporators...')
-        tx_state = np.array([self.state.Tx_state.curr_rate,self.state.Tx_state.count_succ])
-        self.observation = np.append(
-            tx_state,
-            np.append(self.state.fee_state,self.state.pre_decision))
+        self.observation = np.append(self.state.fee_state,self.state.pre_decision)
         return self.observation
 
     def init_ddpg(self):
@@ -111,9 +108,8 @@ class Pay_agent():
         return idx,total_fee
 
     def ddpg_learning(self,var,count_Txs,loop,fee):
-        current_time = datetime.now()
         #current observation
-        ob = self.observation
+        pre_ob = self.observation
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
@@ -138,13 +134,18 @@ class Pay_agent():
 
                         self.critic.learn(b_s, b_a, b_r, b_s_)
                         self.actor.learn(b_s)
-        self.state.Tx_state.curr_rate = self.env.current_succ[self.env.TS.value]
-        cumulative_succ_Tx = self.state.Tx_state.count_succ + self.state.Tx_state.curr_rate
-        if count_Txs != 0:
-            self.state.Tx_state.count_succ = cumulative_succ_Tx / count_Txs
         #observation of next step
         ob_ = self.get_ob()
-        self.env.record(current_time,ob,self.ddpg_action,fee,ob_)
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.action.value,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
+        assert len(self.observation) == self.env.state_dim, "Dimension error for ob:%s(req: %s)"%(self.observation,self.env.state_dim)
         return r0,r1,r2
 
     def init_env(self,num_priority,fee_info):
@@ -186,9 +187,8 @@ class Pay_agent():
         return self.action.value,total_fee
 
     def dqn_learning(self,count_Txs,loop,fee,loss):
-        current_time = datetime.now()
         #current observation
-        ob = self.observation
+        pre_ob = self.observation
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
@@ -211,18 +211,17 @@ class Pay_agent():
                         loss += history.history["loss"][0]
                     else:
                         loss = -1
-        self.state.Tx_state.curr_rate = self.env.current_succ[self.env.TS.value]
-        cumulative_succ_Tx = self.state.Tx_state.count_succ + self.state.Tx_state.curr_rate
-        if count_Txs != 0:
-            self.state.Tx_state.count_succ = cumulative_succ_Tx / count_Txs
+
         #observation of next step
         ob_ = self.get_ob()
-        self.env.record(current_time,ob,self.action.value,fee,ob_)
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.action.value,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
+        assert len(self.observation) == self.env.state_dim, "Dimension error for ob:%s(req: %s)"%(self.observation,self.env.state_dim)
         return r0,r1,r2
-
-
-
-        
-        
-
-
