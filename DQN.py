@@ -74,7 +74,7 @@ class DQN:
 
             history = self.eval_network.fit(states, y, epochs=1, verbose=0)
         self.learning_step += 1
-        if self.eps_greedy < 0.95:
+        if self.eps_greedy < 0.9:
             self.eps_greedy += self.eps_increment
 
         return history
