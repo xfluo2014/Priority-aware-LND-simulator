@@ -100,6 +100,7 @@ class Pay_env():
                 temp_ns.success = True
                 temp_ns.pay_time = pay_time
                 self.payment_sets[ts][idx_pay] = temp_ns
+                #num of success Tx +1 in this time step
                 self.current_succ[self.TS.value] += 1
 
     #update payment priorities
@@ -170,15 +171,29 @@ class Pay_env():
         del self.records[k]
         return s,a,r,s_
 
-    def record(self, k, ob,action,fee,ob_):
+    def record(self,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
         s = np.array([x for x in ob])
-        a = copy.deepcopy(action)
-        r = fee
-        s_ = np.array([x for x in ob_])
-        self.records[self.TS.value] = [s,a,r,s_]
-        del self.current_succ[self.TS.value]
-        self.TS.value = k
+        assert len(s) == self.state_dim, "Dimension error for state s:%s(req: %s)"%(s,self.state_dim)
+        a = copy.deepcopy(a)
+        r = f
+        k = self.TS.value
+        #Get current rate
+        curr_rate = self.current_succ[k]
+        self.TS.value = datetime.now()
         self.current_succ[self.TS.value] = 0
+        del self.current_succ[k]
+        #Calculate cumulative success ratio
+        cum_succ_Txs = cum_succ_Txs + curr_rate
+        cum_succ_ratio = 0
+        if cum_sent_Txs != 0:
+            cum_succ_ratio = cum_succ_Txs / cum_sent_Txs
+        #The state of Txs
+        Tx_s = np.array([curr_rate,cum_succ_ratio])
+        ob_ = np.append(Tx_s,ob_)
+        s_ = np.array([x for x in ob_])
+        assert len(s_) == self.state_dim, "Dimension error for state s_:%s(req: %s)"%(s_,self.state_dim)
+        self.records[k] = [s,a,r,s_]
+        return curr_rate,cum_succ_Txs,ob_
         #self.update_pays(k)
         #return self.state,self.rewards[timestamp],done,{}
 
@@ -202,3 +217,4 @@ class Pay_env():
         #self.payment_set[:] = []
         self.settle_times.clear()
         gc.collect()
+        
