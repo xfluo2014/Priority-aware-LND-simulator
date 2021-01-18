@@ -7,7 +7,7 @@ from p_mailbox import Mailbox
 from payments import payment
 from a_core import Pay_agent
 import DDPG
-import copy,gc,psutil
+import copy,gc
 
 lock = Lock()
 
