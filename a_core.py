@@ -110,11 +110,13 @@ class Pay_agent():
     def ddpg_learning(self,var,count_Txs,loop,fee):
         #current observation
         pre_ob = self.observation
+        curr_time = self.env.TS.value
+        self.env.TS.value = datetime.now()
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
+            time_now = self.env.TS.value
             for ts in TSidx_settle_times:
-                time_now = self.env.TS.value
                 if time_now > self.env.settle_times[ts]:
                     r, achieve_rate,count_succ = self.env.cal_reward(ts)
                     r1 += achieve_rate
@@ -137,8 +139,9 @@ class Pay_agent():
         #observation of next step
         ob_ = self.get_ob()
         curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            t = curr_time,
             ob = pre_ob,
-            a = self.action.value,
+            a = self.ddpg_action,
             f = fee,
             ob_ = ob_,
             cum_succ_Txs = self.state.Tx_state.count_succ,
@@ -189,11 +192,13 @@ class Pay_agent():
     def dqn_learning(self,count_Txs,loop,fee,loss):
         #current observation
         pre_ob = self.observation
+        curr_time = self.env.TS.value
+        self.env.TS.value = datetime.now()
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
+            time_now = self.env.TS.value
             for ts in TSidx_settle_times:
-                time_now = self.env.TS.value
                 if time_now > self.env.settle_times[ts]:
                     r, achieve_rate,count_succ = self.env.cal_reward(ts)
                     r1 += achieve_rate
@@ -215,6 +220,7 @@ class Pay_agent():
         #observation of next step
         ob_ = self.get_ob()
         curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            t = curr_time,
             ob = pre_ob,
             a = self.action.value,
             f = fee,
