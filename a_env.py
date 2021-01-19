@@ -139,7 +139,7 @@ class Pay_env():
     def cal_reward(self,k):
         #The weight of each factors
         #weight_suss = 100
-        weight_rate = 0.5
+        weight_rate = 0.8
         weight_fee = 1 - weight_rate
         #suss_ratio = self.get_success_ratio(k,pay_list)
         #rate_reward = 0
@@ -170,13 +170,15 @@ class Pay_env():
         del self.records[k]
         return s,a,r,s_
 
-    def record(self,t,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
+    def record(self,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
         s = np.array([x for x in ob])
         #assert len(s) == self.state_dim, "Dimension error for state s:%s(req: %s)"%(s,self.state_dim)
         a = copy.deepcopy(a)
         r = f
+        t = self.TS.value
         #update current Tx state
         curr_rate = self.current_succ[t]
+        self.TS.value = datetime.now()
         self.current_succ[self.TS.value] = 0
         del self.current_succ[t]
         cum_succ_Txs = cum_succ_Txs + curr_rate
