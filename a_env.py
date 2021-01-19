@@ -100,7 +100,6 @@ class Pay_env():
                 temp_ns.success = True
                 temp_ns.pay_time = pay_time
                 self.payment_sets[ts][idx_pay] = temp_ns
-                #num of success Tx +1 in this time step
                 self.current_succ[self.TS.value] += 1
 
     #update payment priorities
@@ -140,7 +139,7 @@ class Pay_env():
     def cal_reward(self,k):
         #The weight of each factors
         #weight_suss = 100
-        weight_rate = 0.8
+        weight_rate = 0.5
         weight_fee = 1 - weight_rate
         #suss_ratio = self.get_success_ratio(k,pay_list)
         #rate_reward = 0
@@ -171,28 +170,24 @@ class Pay_env():
         del self.records[k]
         return s,a,r,s_
 
-    def record(self,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
+    def record(self,t,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
         s = np.array([x for x in ob])
-        assert len(s) == self.state_dim, "Dimension error for state s:%s(req: %s)"%(s,self.state_dim)
+        #assert len(s) == self.state_dim, "Dimension error for state s:%s(req: %s)"%(s,self.state_dim)
         a = copy.deepcopy(a)
         r = f
-        k = self.TS.value
-        #Get current rate
-        curr_rate = self.current_succ[k]
-        self.TS.value = datetime.now()
+        #update current Tx state
+        curr_rate = self.current_succ[t]
         self.current_succ[self.TS.value] = 0
-        del self.current_succ[k]
-        #Calculate cumulative success ratio
+        del self.current_succ[t]
         cum_succ_Txs = cum_succ_Txs + curr_rate
         cum_succ_ratio = 0
         if cum_sent_Txs != 0:
             cum_succ_ratio = cum_succ_Txs / cum_sent_Txs
-        #The state of Txs
         Tx_s = np.array([curr_rate,cum_succ_ratio])
         ob_ = np.append(Tx_s,ob_)
         s_ = np.array([x for x in ob_])
-        assert len(s_) == self.state_dim, "Dimension error for state s_:%s(req: %s)"%(s_,self.state_dim)
-        self.records[k] = [s,a,r,s_]
+        #assert len(s_) == self.state_dim, "Dimension error for state s_:%s(req: %s)"%(s_,self.state_dim)
+        self.records[t] = [s,a,r,s_]
         return curr_rate,cum_succ_Txs,ob_
         #self.update_pays(k)
         #return self.state,self.rewards[timestamp],done,{}
@@ -217,4 +212,3 @@ class Pay_env():
         #self.payment_set[:] = []
         self.settle_times.clear()
         gc.collect()
-        
