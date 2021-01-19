@@ -110,14 +110,22 @@ class Pay_agent():
     def ddpg_learning(self,var,count_Txs,loop,fee):
         #current observation
         pre_ob = self.observation
-        curr_time = self.env.TS.value
-        self.env.TS.value = datetime.now()
+        #observation of next step
+        ob_ = self.get_ob()
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.ddpg_action,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
-            time_now = self.env.TS.value
             for ts in TSidx_settle_times:
-                if time_now > self.env.settle_times[ts]:
+                if self.env.TS.value > self.env.settle_times[ts]:
                     r, achieve_rate,count_succ = self.env.cal_reward(ts)
                     r1 += achieve_rate
                     r2 += count_succ
@@ -127,7 +135,7 @@ class Pay_agent():
                         self.M.store_transition(m_s, m_a, m_r, m_s_)
 
                     if self.M.pointer > self.MEMORY_CAPACITY:
-                        var *= .99995    # decay the action randomness
+                        var *= .9995    # decay the action randomness
                         b_M = self.M.sample(self.Batchsize)
                         b_s = b_M[:, :self.env.state_dim]
                         b_a = b_M[:, self.env.state_dim: self.env.state_dim + self.env.action_dim]
@@ -136,19 +144,7 @@ class Pay_agent():
 
                         self.critic.learn(b_s, b_a, b_r, b_s_)
                         self.actor.learn(b_s)
-        #observation of next step
-        ob_ = self.get_ob()
-        curr_rate,cum_succ_Txs,self.observation = self.env.record(
-            t = curr_time,
-            ob = pre_ob,
-            a = self.ddpg_action,
-            f = fee,
-            ob_ = ob_,
-            cum_succ_Txs = self.state.Tx_state.count_succ,
-            cum_sent_Txs = count_Txs)
-        self.state.Tx_state.curr_rate = curr_rate
-        self.state.Tx_state.count_succ = cum_succ_Txs
-        assert len(self.observation) == self.env.state_dim, "Dimension error for ob:%s(req: %s)"%(self.observation,self.env.state_dim)
+
         return r0,r1,r2
 
     def init_env(self,num_priority,fee_info):
@@ -192,14 +188,22 @@ class Pay_agent():
     def dqn_learning(self,count_Txs,loop,fee,loss):
         #current observation
         pre_ob = self.observation
-        curr_time = self.env.TS.value
-        self.env.TS.value = datetime.now()
+        #observation of next step
+        ob_ = self.get_ob()
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.action.value,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
-            time_now = self.env.TS.value
             for ts in TSidx_settle_times:
-                if time_now > self.env.settle_times[ts]:
+                if self.env.TS.value > self.env.settle_times[ts]:
                     r, achieve_rate,count_succ = self.env.cal_reward(ts)
                     r1 += achieve_rate
                     r2 += count_succ
@@ -217,17 +221,4 @@ class Pay_agent():
                     else:
                         loss = -1
 
-        #observation of next step
-        ob_ = self.get_ob()
-        curr_rate,cum_succ_Txs,self.observation = self.env.record(
-            t = curr_time,
-            ob = pre_ob,
-            a = self.action.value,
-            f = fee,
-            ob_ = ob_,
-            cum_succ_Txs = self.state.Tx_state.count_succ,
-            cum_sent_Txs = count_Txs)
-        self.state.Tx_state.curr_rate = curr_rate
-        self.state.Tx_state.count_succ = cum_succ_Txs
-        assert len(self.observation) == self.env.state_dim, "Dimension error for ob:%s(req: %s)"%(self.observation,self.env.state_dim)
         return r0,r1,r2
