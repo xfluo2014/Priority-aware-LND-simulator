@@ -127,7 +127,7 @@ class Pay_agent():
                         self.M.store_transition(m_s, m_a, m_r, m_s_)
 
                     if self.M.pointer > self.MEMORY_CAPACITY:
-                        var *= .9995    # decay the action randomness
+                        var *= .99995    # decay the action randomness
                         b_M = self.M.sample(self.Batchsize)
                         b_s = b_M[:, :self.env.state_dim]
                         b_a = b_M[:, self.env.state_dim: self.env.state_dim + self.env.action_dim]
