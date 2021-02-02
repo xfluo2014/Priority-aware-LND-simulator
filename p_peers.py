@@ -254,7 +254,8 @@ class peer:
 					t_delta = (datetime.datetime.now()-crt_time).total_seconds()
 					var_count += 1
 					self.count_Txs += 1
-					time.sleep(self.accelerate/self.pay_rate.value-t_delta)
+					if t_delta < self.accelerate/self.pay_rate.value:
+						time.sleep(self.accelerate/self.pay_rate.value-t_delta)
 				else:
 					lock.acquire()
 					self.Num_TS.value += 1
