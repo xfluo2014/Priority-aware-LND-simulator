@@ -33,6 +33,8 @@ class peer:
 		#self.fee_recorded = self.manage.Value('i',0)
 		self.ns = self.manage.Namespace()
 		self.created_htlc = self.manage.dict()
+		self.pay_rate = self.manage.Value('i',0)
+		self.record_rate = self.manage.list()
 		#record pays as a receiver
 		#self.lastHop_htlc = []
 		#queue in which all htlc needs to be forwarded
@@ -133,8 +135,9 @@ class peer:
 
 				r_set.append(ep_reward)
 				print('Episode:\t', len(r_set), '\tReward:\t' ,ep_reward)
-				#with open(self.save_rate,'a') as f:
-				#	for key in self.achieved_rate.keys():
+				with open('./records/peer'+str(self.peerID)+'_rate.txt','a') as f:
+					f.write(self.record_rate+'\n')
+				self.record_rate = []
 				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
 				avg_rate = avg_rate/self.pay_agent.env.TS_inEpisode
@@ -203,9 +206,11 @@ class peer:
 			var_pair = self.pay_info['pair']
 			var_route = [x for x in self.pay_info['route']]
 			var_count = 0
+			self.pay_rate.value = self.pay_info['rate']
+			self.record_rate.append(self.pay_rate.value)
 			#current_time = datetime.datetime.now()
 			while True:
-				if var_count < self.pay_info['rate']:
+				if var_count < self.pay_rate.value:
 					var_demand=datetime.timedelta(seconds=self.pay_info['demand'])
 					#priority set
 					p_sets = []
@@ -245,17 +250,17 @@ class peer:
 					#communication  between two process
 					circuit = forward_pay_info['r_hop'][0]
 					self.mailbox[circuit].htlc_in(forward_pay_info)
-					
+					t_delta = (datetime.datetime.now()-crt_time).total_seconds()
 					var_count += 1
 					self.count_Txs += 1
-					time.sleep(self.accelerate/self.pay_info['rate'])
+					time.sleep(self.accelerate/self.pay_rate.value-t_delta)
 				else:
 					lock.acquire()
 					self.Num_TS.value += 1
 					lock.release()
 					var_count = 0
-					#time_delta = current_time
-					#current_time = datetime.datetime.now()
+					self.pay_rate.value=random.randint(4,9)
+					self.record_rate.append(self.pay_rate.value)
 					#time_delta = (current_time-time_delta).total_seconds()
 					#time.sleep(self.accelerate)
 
