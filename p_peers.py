@@ -137,7 +137,9 @@ class peer:
 				r_set.append(ep_reward)
 				print('Episode:\t', len(r_set), '\tReward:\t' ,ep_reward)
 				with open('./records/peer'+str(self.peerID)+'_rate.txt','a') as f:
-					f.write(self.record_rate+'\n')
+					for i in self.record_rate:
+						f.write(str(i))
+					f.write('\n')
 				self.record_rate = []
 				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
