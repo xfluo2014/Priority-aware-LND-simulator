@@ -139,7 +139,7 @@ class Pay_env():
     def cal_reward(self,k):
         #The weight of each factors
         #weight_suss = 100
-        weight_rate = 0.5
+        weight_rate = 0.8
         weight_fee = 1 - weight_rate
         #suss_ratio = self.get_success_ratio(k,pay_list)
         #rate_reward = 0
