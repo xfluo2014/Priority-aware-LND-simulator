@@ -1,7 +1,6 @@
 from channels import channel
 from p_peers import peer
 from payments import payment
-import scipy.stats as ss
 import time,datetime
 import random
 import numpy as np
