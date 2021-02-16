@@ -136,11 +136,11 @@ class peer:
 
 				r_set.append(ep_reward)
 				print('Episode:\t', len(r_set), '\tReward:\t' ,ep_reward)
-				with open('./records/peer'+str(self.peerID)+'_rate.txt','a+') as f:
+				with open('./records/peer'+str(self.peerID)+'_rate.txt','a') as f:
 					for i in self.record_rate:
-						f.write(str(i))
+						f.write(str(i)+' ')
 					f.write('\n')
-				self.record_rate = []
+				self.record_rate[:] = []
 				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
 				avg_rate = avg_rate/self.pay_agent.env.TS_inEpisode
@@ -263,7 +263,7 @@ class peer:
 					self.Num_TS.value += 1
 					lock.release()
 					var_count = 0
-					self.pay_rate.value=random.randint(4,9)
+					self.pay_rate.value = self.pay_info['rate'] + self.disc_normal()
 					self.record_rate.append(self.pay_rate.value)
 					#time_delta = (current_time-time_delta).total_seconds()
 					#time.sleep(self.accelerate)
@@ -312,3 +312,13 @@ class peer:
 				#lock.acquire()
 				peerObjs[peer].pay_agent.action_set[peerID] = msg
 				#lock.release()
+				
+				
+	#define discrete normal distribution
+	def disc_normal(self,var_size = 1,floating = 4):
+		x = np.arange(-floating, floating)
+		xU, xL = x + 0.5, x - 0.5
+		prob = ss.norm.cdf(xU, scale = 3) - ss.norm.cdf(xL, scale = 3)
+		prob = prob / prob.sum() #normalize the probabilities so their sum is 1
+		nums, = np.random.choice(x, size = var_size, p = prob)
+		return nums
