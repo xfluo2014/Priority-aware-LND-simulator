@@ -8,7 +8,7 @@ import keras.backend as K
 
 K.clear_session()
 class DQN:
-    def __init__(self,agentID, n_actions, state_size, gamma=0.99, learning_rate=0.0001,
+    def __init__(self,agentID, n_actions, state_size, gamma=0.99, learning_rate=0.001,
                  eps_greedy=0.5, eps_increment=2e-5, replace_target_freq=2000):
         self.agent_id = agentID
         self.n_actions = n_actions
