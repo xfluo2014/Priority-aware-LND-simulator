@@ -18,8 +18,6 @@ class peer:
 		#payment info [pair, num_pays, route, p_set, demand]
 		self.pay_info = copy.deepcopy(pay_info)
 
-		self.count_Txs = 0
-
 		#self.pay_rate = self.pay_info['rate']
 		self.channels = []
 		#record all peers' forwarding fees
@@ -35,6 +33,7 @@ class peer:
 		self.ns = self.manage.Namespace()
 		self.created_htlc = self.manage.dict()
 		self.pay_rate = self.manage.Value('i',0)
+		self.count_Txs = self.manage.Value('i',0)
 		#self.record_rate = self.manage.list()
 		#record pays as a receiver
 		#self.lastHop_htlc = []
@@ -128,7 +127,7 @@ class peer:
 		avg_fee = 0
 		avg_rate = 0
 		ep_loss = 0
-		self.count_Txs = 0
+		self.count_Txs.value = 0
 		print('Learning started...')
 		#self.pays.start()
 		while True:	
@@ -146,6 +145,7 @@ class peer:
 				avg_rate = avg_rate/self.pay_agent.env.TS_inEpisode
 				with open(self.save_reward,'a') as f:
 					f.write('Episode:\t'+ str(len(r_set))+
+						'\tCount Txs:\t'+str(self.count_Txs.value)+
 						'\tSuccess:\t'+str(count_success)+
 						'\tAvg rate:\t'+str(avg_rate)+
 						'\tAvg fees:\t'+str(avg_fee)+
@@ -158,10 +158,8 @@ class peer:
 				avg_fee = 0
 				#self.pay_agent.action_set = {}
 				lock.acquire()
-				#self.pay_agent.env.records = {}
-				#self.pay_agent.env.reset(self.pay_agent.state,self.pay_agent.cooporator)
-				#self.pay_agent.observation = np.append(self.pay_agent.state.fee_state,self.pay_agent.state.pre_decision)
 				self.Num_TS.value = 0
+				self.count_Txs.value = 0
 				lock.release()
 				print('created htlc:',len(self.created_htlc))
 				print('env settle times:',len(self.pay_agent.env.settle_times))
@@ -187,9 +185,9 @@ class peer:
 
 				lock.acquire()
 				if learning_method =='DQN':
-					r,achieve_rate,num_pays= self.pay_agent.dqn_learning(self.count_Txs,self.Num_TS.value,fee,ep_loss)
+					r,achieve_rate,num_pays= self.pay_agent.dqn_learning(self.Num_TS.value,fee,ep_loss)
 				elif learning_method =='DDPG':
-					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.count_Txs,self.Num_TS.value,fee)
+					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.Num_TS.value,fee)
 				else:
 					print('No learning method')
 				lock.release()
@@ -255,7 +253,7 @@ class peer:
 					self.mailbox[circuit].htlc_in(forward_pay_info)
 					t_delta = (datetime.datetime.now()-crt_time).total_seconds()
 					var_count += 1
-					self.count_Txs += 1
+					self.count_Txs.value += 1
 					if t_delta < self.accelerate/self.pay_rate.value:
 						time.sleep(self.accelerate/self.pay_rate.value-t_delta)
 				else:
