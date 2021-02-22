@@ -126,8 +126,8 @@ class Pay_agent():
             TSidx_settle_times = list(self.env.settle_times.keys())
             for ts in TSidx_settle_times:
                 if self.env.TS.value > self.env.settle_times[ts]:
-                    r, achieve_rate,count_succ = self.env.cal_reward(ts)
-                    r1 += achieve_rate
+                    r, avg_time,count_succ = self.env.cal_reward(ts)
+                    r1 += avg_time
                     r2 += count_succ
                     m_s, m_a, m_r, m_s_ = self.env.get_record(ts)
                     if loop >= 10:
@@ -204,8 +204,8 @@ class Pay_agent():
             TSidx_settle_times = list(self.env.settle_times.keys())
             for ts in TSidx_settle_times:
                 if self.env.TS.value > self.env.settle_times[ts]:
-                    r, achieve_rate,count_succ = self.env.cal_reward(ts)
-                    r1 += achieve_rate
+                    r, avg_time,count_succ = self.env.cal_reward(ts)
+                    r1 += avg_time
                     r2 += count_succ
                     m_s, m_a, m_r, m_s_ = self.env.get_record(ts)
                     size = self.M.pointer
