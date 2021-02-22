@@ -128,6 +128,7 @@ class peer:
 		avg_rate = 0
 		ep_loss = 0
 		self.count_Txs.value = 0
+		Txs_inPrePeriod = 0
 		print('Learning started...')
 		#self.pays.start()
 		while True:	
@@ -143,9 +144,10 @@ class peer:
 				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
 				avg_rate = avg_rate/self.pay_agent.env.TS_inEpisode
+				Txs_inPeriod = self.count_Txs.value - Txs_inPrePeriod
 				with open(self.save_reward,'a') as f:
 					f.write('Episode:\t'+ str(len(r_set))+
-						'\tCount Txs:\t'+str(self.count_Txs.value)+
+						'\tCount Txs:\t'+str(Txs_inPeriod)+
 						'\tSuccess:\t'+str(count_success)+
 						'\tAvg rate:\t'+str(avg_rate)+
 						'\tAvg fees:\t'+str(avg_fee)+
@@ -156,6 +158,7 @@ class peer:
 				count_success = 0
 				ep_loss = 0
 				avg_fee = 0
+				Txs_inPrePeriod = self.count_Txs.value
 				#self.pay_agent.action_set = {}
 				lock.acquire()
 				self.Num_TS.value = 0
@@ -185,9 +188,9 @@ class peer:
 
 				lock.acquire()
 				if learning_method =='DQN':
-					r,achieve_rate,num_pays= self.pay_agent.dqn_learning(self.Num_TS.value,fee,ep_loss)
+					r,achieve_rate,num_pays= self.pay_agent.dqn_learning(self.count_Txs.value,self.Num_TS.value,fee,ep_loss)
 				elif learning_method =='DDPG':
-					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.Num_TS.value,fee)
+					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.count_Txs.value,self.Num_TS.value,fee)
 				else:
 					print('No learning method')
 				lock.release()
