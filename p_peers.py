@@ -125,7 +125,7 @@ class peer:
 		count_success = 0
 		ep_reward = 0
 		avg_fee = 0
-		avg_rate = 0
+		avg_time = 0
 		ep_loss = 0
 		self.count_Txs.value = 0
 		Txs_inPrePeriod = 0
@@ -143,13 +143,13 @@ class peer:
 				#self.record_rate[:] = []
 				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
-				avg_rate = avg_rate/self.pay_agent.env.TS_inEpisode
+				avg_time = avg_time/self.pay_agent.env.TS_inEpisode
 				Txs_inPeriod = self.count_Txs.value - Txs_inPrePeriod
 				with open(self.save_reward,'a') as f:
 					f.write('Episode:\t'+ str(len(r_set))+
 						'\tCount Txs:\t'+str(Txs_inPeriod)+
 						'\tSuccess:\t'+str(count_success)+
-						'\tAvg rate:\t'+str(avg_rate)+
+						'\tAvg time:\t'+str(avg_time)+
 						'\tAvg fees:\t'+str(avg_fee)+
 						'\tReward:\t'+str(ep_reward)+
 						'\n')
@@ -188,7 +188,7 @@ class peer:
 
 				lock.acquire()
 				if learning_method =='DQN':
-					r,achieve_rate,num_pays= self.pay_agent.dqn_learning(self.count_Txs.value,self.Num_TS.value,fee,ep_loss)
+					r,Avg_Time,num_pays= self.pay_agent.dqn_learning(self.count_Txs.value,self.Num_TS.value,fee,ep_loss)
 				elif learning_method =='DDPG':
 					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.count_Txs.value,self.Num_TS.value,fee)
 				else:
@@ -199,7 +199,7 @@ class peer:
 				#print('Peer:',self.peerID,' Round: ',self.Num_TS.value,' Count success Txs:',count_success, 'Current reward:',r)
 				ep_reward += r
 				avg_fee += fee
-				avg_rate += achieve_rate
+				avg_time += Avg_Time
 
 
 	#send record info and first hop for self payments
