@@ -126,12 +126,13 @@ class Pay_env():
         Achieve_rate = 0
         #True pay rate must less than the sending rate
         rate_limited = self.payment_sets[k][0].p_rate
+        avg_pay_time = 0
         if len(pay_times)>0:
             avg_pay_time = sum(pay_times)/len(pay_times)
             cal_rate = round(count_succ/avg_pay_time,2) 
             Achieve_rate = cal_rate if cal_rate < rate_limited else rate_limited
         #suss_ratio = count_succ/len(self.payment_sets[k])
-        return Achieve_rate,count_succ
+        return Achieve_rate,count_succ,avg_pay_time
 
 
     #calculate the reward of k-th set payments with 
@@ -143,7 +144,7 @@ class Pay_env():
         weight_fee = 1 - weight_rate
         #suss_ratio = self.get_success_ratio(k,pay_list)
         #rate_reward = 0
-        Achieve_rate,count_succ = self.get_metric(k)
+        Achieve_rate,count_succ,avg_pay_time = self.get_metric(k)
         fee = self.records[k][2]
 
         norm_rate = round(Achieve_rate/self.payment_sets[k][0].p_rate,2)
@@ -157,7 +158,7 @@ class Pay_env():
         self.records[k][2] = reward
         del self.payment_sets[k]
         del self.settle_times[k]
-        return reward,Achieve_rate,count_succ
+        return reward,avg_pay_time,count_succ
         
 
     def get_record(self,k):
