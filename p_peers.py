@@ -162,7 +162,6 @@ class peer:
 				#self.pay_agent.action_set = {}
 				lock.acquire()
 				self.Num_TS.value = 0
-				self.count_Txs.value = 0
 				lock.release()
 				print('created htlc:',len(self.created_htlc))
 				print('env settle times:',len(self.pay_agent.env.settle_times))
