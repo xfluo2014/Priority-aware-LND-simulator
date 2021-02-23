@@ -2,7 +2,11 @@ import networkx as nx
 import random
 
 Num_nodes = 50
+<<<<<<< HEAD
 Num_pairs = 40
+=======
+Num_pairs = 20
+>>>>>>> origin/Version0224
 Num_priority = 3
 
 #generate graph of PCN
@@ -53,32 +57,52 @@ for i in range(Num_pairs):
             temp_sender = temp_receiver
     Pairs.append((temp_sender,temp_receiver))
     #temp_rate = random.randint(10,20)
+<<<<<<< HEAD
     Pay_rate[(temp_sender,temp_receiver)] = random.randint(5,9)
+=======
+    Pay_rate[(temp_sender,temp_receiver)] = random.randint(3,9)
+>>>>>>> origin/Version0224
     Pay_amount[(temp_sender,temp_receiver)] = 1
 
 print("Pairs: ",Pairs)
 
 #generate payment path
 write_path = open("path.txt","w")
+<<<<<<< HEAD
 maxNum_path = 20
 for p in Pairs:
     count_path = 0
     temp_path_list = {}
     for path in map(nx.utils.pairwise, nx.all_simple_paths(G,p[0],p[1])):
+=======
+maxNum_path = 3
+for p in Pairs:
+    count_path = 0
+    temp_path_list = {}
+    for path in map(nx.utils.pairwise, nx.all_shortest_paths(G,p[0],p[1])):
+>>>>>>> origin/Version0224
         temp_path_list[count_path] = [x for x in path]
         count_path += 1
         if count_path >= maxNum_path:
             break
     recard_path = []
     for tp in temp_path_list.values():
+<<<<<<< HEAD
         if len(list(tp))>=3 and len(list(tp))<=8:
+=======
+        if len(list(tp))>2:
+>>>>>>> origin/Version0224
             recard_path = [x for x in tp]
             print(recard_path)
             break
     if recard_path ==[]:
+<<<<<<< HEAD
         print('No path satisfied')
         continue
         #recard_path  = [x for x in temp_path_list[0]]
+=======
+        recard_path  = [x for x in temp_path_list[0]]
+>>>>>>> origin/Version0224
     for h in recard_path:
         write_path.write('(%s,%s)\t'%(h[0],h[1]))
     write_path.write('\n')
@@ -102,7 +126,11 @@ read_path.close()
 #user demand of payment time
 D_ij = {}
 for i in Pairs:
+<<<<<<< HEAD
     D_ij[i] = 2 if len(Routes[i][0])>1 else 1
+=======
+    D_ij[i] = len(Routes[i][0])-1 if len(Routes[i][0])>1 else 1
+>>>>>>> origin/Version0224
 
 #write payment info in file
 write_payInfo = open("payment_info.txt","w")

@@ -12,7 +12,11 @@ from multiprocessing import Manager
 class TxState():
     def __init__(self):
         self.curr_rate = 0
+<<<<<<< HEAD
         #self.count_succ = 0
+=======
+        self.count_succ = 0
+>>>>>>> origin/Version0224
 
 class Agentstate():
     def __init__(self):
@@ -107,11 +111,16 @@ class Pay_agent():
         self.state.pre_decision = []
         return idx,total_fee
 
+<<<<<<< HEAD
     def ddpg_learning(self,var,loop,fee):
+=======
+    def ddpg_learning(self,var,count_Txs,loop,fee):
+>>>>>>> origin/Version0224
         #current observation
         pre_ob = self.observation
         #observation of next step
         ob_ = self.get_ob()
+<<<<<<< HEAD
         curr_rate,self.observation = self.env.record(
             ob = pre_ob,
             a = self.ddpg_action,
@@ -119,13 +128,29 @@ class Pay_agent():
             ob_ = ob_)
         self.state.Tx_state.curr_rate = curr_rate
         #self.state.Tx_state.count_succ = cum_succ_Txs
+=======
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.ddpg_action,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
+>>>>>>> origin/Version0224
         r0,r1,r2 = 0,0,0
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
             for ts in TSidx_settle_times:
                 if self.env.TS.value > self.env.settle_times[ts]:
+<<<<<<< HEAD
                     r, achieve_rate,count_succ = self.env.cal_reward(ts)
                     r1 += achieve_rate
+=======
+                    r, avg_time,count_succ = self.env.cal_reward(ts)
+                    r1 += avg_time
+>>>>>>> origin/Version0224
                     r2 += count_succ
                     m_s, m_a, m_r, m_s_ = self.env.get_record(ts)
                     if loop >= 10:
@@ -153,8 +178,12 @@ class Pay_agent():
             fee_info = fee_info,
             num_cooporator=self.cooporator)
         self.env.reset(self.state,self.cooporator)
+<<<<<<< HEAD
         #tx_state = np.array([self.state.Tx_state.curr_rate,self.state.Tx_state.count_succ])
         tx_state = np.array([self.state.Tx_state.curr_rate])
+=======
+        tx_state = np.array([self.state.Tx_state.curr_rate,self.state.Tx_state.count_succ])
+>>>>>>> origin/Version0224
         self.observation = np.append(
             tx_state,
             np.append(self.state.fee_state,self.state.pre_decision))
@@ -184,11 +213,16 @@ class Pay_agent():
         self.state.pre_decision = []
         return self.action.value,total_fee
 
+<<<<<<< HEAD
     def dqn_learning(self,loop,fee):
+=======
+    def dqn_learning(self,count_Txs,loop,fee,loss):
+>>>>>>> origin/Version0224
         #current observation
         pre_ob = self.observation
         #observation of next step
         ob_ = self.get_ob()
+<<<<<<< HEAD
         curr_rate,self.observation = self.env.record(
             ob = pre_ob,
             a = self.action.value,
@@ -197,6 +231,18 @@ class Pay_agent():
         self.state.Tx_state.curr_rate = curr_rate
         #self.state.Tx_state.count_succ = cum_succ_Txs
         r0,r1,r2,loss = 0,0,0,0
+=======
+        curr_rate,cum_succ_Txs,self.observation = self.env.record(
+            ob = pre_ob,
+            a = self.action.value,
+            f = fee,
+            ob_ = ob_,
+            cum_succ_Txs = self.state.Tx_state.count_succ,
+            cum_sent_Txs = count_Txs)
+        self.state.Tx_state.curr_rate = curr_rate
+        self.state.Tx_state.count_succ = cum_succ_Txs
+        r0,r1,r2 = 0,0,0
+>>>>>>> origin/Version0224
         if self.env.settle_times != None:
             TSidx_settle_times = list(self.env.settle_times.keys())
             for ts in TSidx_settle_times:
@@ -218,4 +264,8 @@ class Pay_agent():
                     else:
                         loss = -1
 
+<<<<<<< HEAD
         return r0,r1,r2,loss
+=======
+        return r0,r1,r2
+>>>>>>> origin/Version0224

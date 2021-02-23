@@ -12,7 +12,11 @@ print(len(G.edges))
 pos = nx.spring_layout(G)
 nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'), node_size = 500)
 nx.draw_networkx_labels(G, pos)
+<<<<<<< HEAD
 #red_nodes = [22,41]
+=======
+red_nodes = [22,41]
+>>>>>>> origin/Version0224
 #nx.draw_networkx_nodes(G, pos, nodelist=red_nodes,node_color='r',cmap=plt.get_cmap('jet'), node_size = 500)
 #nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='r', arrows=True)
 nx.draw_networkx_edges(G, pos)

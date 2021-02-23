@@ -171,7 +171,11 @@ class Pay_env():
         del self.records[k]
         return s,a,r,s_
 
+<<<<<<< HEAD
     def record(self,ob,a,f,ob_):
+=======
+    def record(self,ob,a,f,ob_,cum_succ_Txs,cum_sent_Txs):
+>>>>>>> origin/Version0224
         s = np.array([x for x in ob])
         #assert len(s) == self.state_dim, "Dimension error for state s:%s(req: %s)"%(s,self.state_dim)
         a = copy.deepcopy(a)
@@ -182,16 +186,28 @@ class Pay_env():
         self.TS.value = datetime.now()
         self.current_succ[self.TS.value] = 0
         del self.current_succ[t]
+<<<<<<< HEAD
         #cum_succ_Txs = cum_succ_Txs + curr_rate
         #cum_succ_ratio = 0
         #if cum_sent_Txs != 0:
         #    cum_succ_ratio = cum_succ_Txs / cum_sent_Txs
         Tx_s = np.array([curr_rate])
+=======
+        cum_succ_Txs = cum_succ_Txs + curr_rate
+        cum_succ_ratio = 0
+        if cum_sent_Txs != 0:
+            cum_succ_ratio = cum_succ_Txs / cum_sent_Txs
+        Tx_s = np.array([curr_rate,cum_succ_ratio])
+>>>>>>> origin/Version0224
         ob_ = np.append(Tx_s,ob_)
         s_ = np.array([x for x in ob_])
         #assert len(s_) == self.state_dim, "Dimension error for state s_:%s(req: %s)"%(s_,self.state_dim)
         self.records[t] = [s,a,r,s_]
+<<<<<<< HEAD
         return curr_rate,ob_
+=======
+        return curr_rate,cum_succ_Txs,ob_
+>>>>>>> origin/Version0224
         #self.update_pays(k)
         #return self.state,self.rewards[timestamp],done,{}
 
@@ -200,9 +216,15 @@ class Pay_env():
         #self.state = np.array(self.np_random.randint(low = 0,high = self.num_priority,\
         #             size=(self.num_relayer,)))
         p_set = (self.num_priority-1)*np.ones(self.num_relayer,dtype=int)
+<<<<<<< HEAD
         #state.Tx_state.count_succ = 0
         state.Tx_state.curr_rate = 0
         tx_state = np.array([state.Tx_state.curr_rate])
+=======
+        state.Tx_state.count_succ = 0
+        state.Tx_state.curr_rate = 0
+        tx_state = np.array([state.Tx_state.count_succ,state.Tx_state.curr_rate])
+>>>>>>> origin/Version0224
         state.fee_state = np.array([self.fee_info[j][p_set[i]] for i,j in enumerate(self.intermediate_users)])
         state.pre_decision = np.zeros(num_cooporator,dtype=np.int64)
         self.state_dim = len(np.append(

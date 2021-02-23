@@ -16,6 +16,21 @@ def Manager():
     m.start()
     return m
 
+<<<<<<< HEAD
+=======
+
+class Prioritize:
+    def __init__(self, priority, item):
+        self.priority = priority
+        self.item = item
+
+    def __eq__(self, other):
+        return self.priority == other.priority
+
+    def __lt__(self, other):
+        return self.priority < other.priority
+
+>>>>>>> origin/Version0224
 class Mailbox:
     def __init__(self,p_id,chan,peerObjs,process_rate,num_priorities,queue_size,accelerate,fee_policy):
         self.accelerate_mb = accelerate
@@ -31,6 +46,23 @@ class Mailbox:
         self.processing_rate = process_rate
         self.forward = Process(target=self.htlc_out,args=(chan,peerObjs))
 
+<<<<<<< HEAD
+=======
+
+    #insert pay_hash of htlc and its rest priorities set (p_set) to corresponding queue (p).
+    #msg{create time, payment hash, rest hops, priorities set}
+    #msg = [payer, pay_hash, r_hop, p_set]
+    def htlc_in(self,msg):
+        #get the priority of payment for this peer
+        current_priority = msg['p_set'][0]
+        #remove current priority from list
+        msg['p_set'].pop(0)
+        in_queue = Prioritize(current_priority,msg)
+        #print('To priority queue:',in_queue)
+        self.p_queue.put(in_queue)
+        
+
+>>>>>>> origin/Version0224
     def htlc_out(self,chan,peerObjs):
         while True:
             current_time = datetime.datetime.now()
@@ -38,9 +70,19 @@ class Mailbox:
             while len(data_re)>0:
                 payer_id,p_hash = data_re.pop()
                 del peerObjs[payer_id].created_htlc[p_hash]
+<<<<<<< HEAD
             msg = self.p_queue.get(block=True)
             #simulate the processing time
             time.sleep(self.accelerate_mb/self.processing_rate)
+=======
+
+            out_queue = self.p_queue.get(block=True)
+            msg = out_queue.item
+            #simulate the processing time
+            time.sleep(self.accelerate_mb/self.processing_rate)
+            #find target channel
+            #current_hop = msg['r_hop'][0]
+>>>>>>> origin/Version0224
             current_time = datetime.datetime.now()
             msg['trace'][str(chan.hop)] = current_time
             chan.htlc_queue.put(msg)
