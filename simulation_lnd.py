@@ -92,18 +92,6 @@ for i in range(Num_nodes):
 
 #print(payments_info)
 
-<<<<<<< HEAD
-
-=======
-#define discrete normal distribution
-def disc_normal(lb,ub,var_size):
-	x = np.arange(lb, ub+1)
-	xU, xL = x + 0.5, x - 0.5
-	prob = ss.norm.cdf(xU, scale = 3) - ss.norm.cdf(xL, scale = 3)
-	prob = prob / prob.sum() #normalize the probabilities so their sum is 1
-	nums = np.random.choice(x, size = var_size, p = prob)
-	return nums
->>>>>>> origin/Version0224
 
 #To dynamiclly adjust the payment info
 '''

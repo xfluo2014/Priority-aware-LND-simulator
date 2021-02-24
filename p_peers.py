@@ -35,11 +35,6 @@ class peer:
 		self.pay_rate = self.manage.Value('i',0)
 		self.count_Txs = self.manage.Value('i',0)
 		#self.record_rate = self.manage.list()
-<<<<<<< HEAD
-=======
-		#record pays as a receiver
-		#self.lastHop_htlc = []
->>>>>>> origin/Version0224
 		#queue in which all htlc needs to be forwarded
 		self.forward_htlc = Queue(30)
 		
@@ -128,11 +123,7 @@ class peer:
 		count_success = 0
 		ep_reward = 0
 		avg_fee = 0
-<<<<<<< HEAD
 		avg_T = 0
-=======
-		avg_time = 0
->>>>>>> origin/Version0224
 		ep_loss = 0
 		self.count_Txs.value = 0
 		Txs_inPrePeriod = 0
@@ -143,7 +134,6 @@ class peer:
 
 				r_set.append(ep_reward)
 				print('Episode:\t', len(r_set), '\tReward:\t' ,ep_reward)
-<<<<<<< HEAD
 				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
 				avg_T = avg_T/self.pay_agent.env.TS_inEpisode
 				Txs_inPeriod = self.count_Txs.value-Txs_inPrePeriod
@@ -154,24 +144,6 @@ class peer:
 						'\tAvg time:\t'+str(avg_T)+
 						'\tAvg fees:\t'+str(avg_fee)+
 						'\tLoss:\t'+str(ep_loss)+
-=======
-				#with open('./records/peer'+str(self.peerID)+'_rate.txt','a') as f:
-				#	for i in self.record_rate:
-				#		f.write(str(i)+' ')
-				#	f.write('\n')
-				#self.record_rate[:] = []
-				#		f.write('Time:\t'+ str(key)+'\tRate:\t'+str(self.achieved_rate[key])+'\n')
-				avg_fee = avg_fee/self.pay_agent.env.TS_inEpisode
-				avg_time = avg_time/self.pay_agent.env.TS_inEpisode
-				Txs_inPeriod = self.count_Txs.value - Txs_inPrePeriod
-				with open(self.save_reward,'a') as f:
-					f.write('Episode:\t'+ str(len(r_set))+
-						'\tCount Txs:\t'+str(Txs_inPeriod)+
-						'\tSuccess:\t'+str(count_success)+
-						'\tAvg time:\t'+str(avg_time)+
-						'\tAvg fees:\t'+str(avg_fee)+
-						'\tReward:\t'+str(ep_reward)+
->>>>>>> origin/Version0224
 						'\n')
 				#self.pay_agent.dqn.save(str(self.peerID))
 				ep_reward = 0
@@ -179,10 +151,6 @@ class peer:
 				ep_loss = 0
 				avg_fee = 0
 				Txs_inPrePeriod = self.count_Txs.value
-<<<<<<< HEAD
-=======
-				#self.pay_agent.action_set = {}
->>>>>>> origin/Version0224
 				lock.acquire()
 				self.Num_TS.value = 0
 				lock.release()
@@ -190,61 +158,33 @@ class peer:
 				print('env settle times:',len(self.pay_agent.env.settle_times))
 				print('env payment sets:',len(self.pay_agent.env.payment_sets))
 			else:
-<<<<<<< HEAD
-=======
-				#lock.acquire()
->>>>>>> origin/Version0224
 				#get the action of this timeslot a_t
 				a_t = 0
 				fee = 0
 				if learning_method =='DQN':
 					a_t,fee = self.pay_agent.step_dqn()
-<<<<<<< HEAD
-=======
-					#fee_delta = fee - self.fee_recorded
-					#self.fee_recorded = fee
->>>>>>> origin/Version0224
 				elif learning_method =='DDPG':
 					a_t,fee = self.pay_agent.step_ddpg(var)
 				else:
 					print('No learning method')
-<<<<<<< HEAD
 				self.share_msg(self.peerID,a_t,peerObjs)
-=======
-				#total_fee = sum([self.fees_info[j][a_t[i]] for i,j in enumerate(self.pay_info['route'][1:])])
-				self.share_msg(self.peerID,a_t,peerObjs)
-				#lock.release()
->>>>>>> origin/Version0224
 
 				time.sleep(self.pay_agent.fresh_time*self.accelerate)
 
 				lock.acquire()
 				if learning_method =='DQN':
-<<<<<<< HEAD
 					r,avg_time,num_pays,loss= self.pay_agent.dqn_learning(self.Num_TS.value,fee)
 				elif learning_method =='DDPG':
 					r,avg_time,num_pays= self.pay_agent.ddpg_learning(var,self.Num_TS.value,fee)
-=======
-					r,Avg_Time,num_pays= self.pay_agent.dqn_learning(self.count_Txs.value,self.Num_TS.value,fee,ep_loss)
-				elif learning_method =='DDPG':
-					r,achieve_rate,num_pays= self.pay_agent.ddpg_learning(var,self.count_Txs.value,self.Num_TS.value,fee)
->>>>>>> origin/Version0224
 				else:
 					print('No learning method')
 				lock.release()
 
 				count_success += num_pays
-<<<<<<< HEAD
 				ep_loss += loss
 				ep_reward += r
 				avg_fee += fee
 				avg_T += avg_time
-=======
-				#print('Peer:',self.peerID,' Round: ',self.Num_TS.value,' Count success Txs:',count_success, 'Current reward:',r)
-				ep_reward += r
-				avg_fee += fee
-				avg_time += Avg_Time
->>>>>>> origin/Version0224
 
 
 	#send record info and first hop for self payments
@@ -257,10 +197,6 @@ class peer:
 			var_count = 0
 			self.pay_rate.value = self.pay_info['rate']
 			#self.record_rate.append(self.pay_rate.value)
-<<<<<<< HEAD
-=======
-			#current_time = datetime.datetime.now()
->>>>>>> origin/Version0224
 			while True:
 				if var_count < self.pay_rate.value:
 					var_demand=datetime.timedelta(seconds=self.pay_info['demand'])
@@ -288,10 +224,6 @@ class peer:
 					lock.acquire()
 					self.created_htlc[new_pay.pay_hash] = new_pay.env_TS
 					lock.release()
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Version0224
 					#insert it into mailbox queue to send
 					forward_pay_info = {}
 					forward_pay_info['payer'] = self.peerID
@@ -304,11 +236,7 @@ class peer:
 					#print(forward_pay_info)
 					#communication  between two process
 					circuit = forward_pay_info['r_hop'][0]
-<<<<<<< HEAD
 					self.mailbox[circuit].p_queue.put(forward_pay_info)
-=======
-					self.mailbox[circuit].htlc_in(forward_pay_info)
->>>>>>> origin/Version0224
 					t_delta = (datetime.datetime.now()-crt_time).total_seconds()
 					var_count += 1
 					self.count_Txs.value += 1
@@ -341,11 +269,7 @@ class peer:
 					self.send_msg(peerObjs[payer_id],pay_hash,pay_time)
 				else:
 					circuit = msg['r_hop'][0]
-<<<<<<< HEAD
 					self.mailbox[circuit].p_queue.put(msg)
-=======
-					self.mailbox[circuit].htlc_in(msg)
->>>>>>> origin/Version0224
 			else:
 				del peerObjs[payer_id].created_htlc[pay_hash]
 
@@ -381,8 +305,4 @@ class peer:
 		prob = ss.norm.cdf(xU, scale = 3) - ss.norm.cdf(xL, scale = 3)
 		prob = prob / prob.sum() #normalize the probabilities so their sum is 1
 		nums, = np.random.choice(x, size = var_size, p = prob)
-<<<<<<< HEAD
 		return nums
-=======
-		return nums
->>>>>>> origin/Version0224
