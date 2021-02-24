@@ -211,7 +211,7 @@ class Pay_agent():
                     if loop >= 10:
                         r0 += r
                         self.M.remember(m_s, m_a, m_r, m_s_,False)
-                    if self.M.pointer > self.MEMORY_CAPACITY/10:
+                    if self.M.pointer > self.MEMORY_CAPACITY/2:
                         #print('DQN learn')
                         history = self.dqn.learn(*self.M.sample(batch))
                         loss += history.history["loss"][0]
