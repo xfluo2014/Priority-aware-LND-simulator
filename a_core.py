@@ -24,7 +24,7 @@ class Agentstate():
 #np.random.seed(1)
 #tf.set_random_seed(1)
 class Pay_agent():
-    def __init__(self,Route,fee_limited,ts_perEpisode,BATCH_SIZE,fresh_time,payerID,num_cooporator):
+    def __init__(self,Route,num_priorities,fee_limited,ts_perEpisode,BATCH_SIZE,fresh_time,payerID,num_cooporator):
         # Payment paramaters
         self.route = Route
         self.fee_limit = fee_limited
@@ -33,7 +33,7 @@ class Pay_agent():
         # ENV paramaters
         self.env= None
         self.payer = payerID
-        self.n_actions = np.power(3,len(self.route)-1)
+        self.n_actions = np.power(num_priorities,len(self.route)-1)
         self.weight_file = './save/DQN'+str(payerID)
         self.fresh_time = fresh_time
         #Memeory paramaters
