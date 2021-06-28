@@ -65,6 +65,7 @@ class peer:
 		self.fee_limited = self.pay_info['fee_limited']
 		self.pay_agent = Pay_agent(
 			Route=self.pay_info['route'],
+			num_priorities = num_priorities,
 			fee_limited = self.fee_limited,
 			ts_perEpisode = 100,
 			BATCH_SIZE=128,
