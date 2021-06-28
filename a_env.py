@@ -28,7 +28,7 @@ class Pay_env():
         self.payment_sets = self.manage.dict()
         self.current_succ = self.manage.dict()
         #self.payment_set = manage.list()
-        self.priorities = None
+        self.priorities = self.manage.list()
         self.records = {}
         self.action_space = spaces.Box(low= 0,high= self.num_priority-1,shape=(self.num_relayer,),dtype=np.int64)
         self.observation_space = []
@@ -104,7 +104,7 @@ class Pay_env():
 
     #update payment priorities
     def set_priorities(self,priorities):
-        self.priorities = [x for x in priorities]
+        self.priorities[:] = [x for x in priorities]
         #print('Priorities:',self.priorities)
 
 
